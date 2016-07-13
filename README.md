@@ -18,12 +18,13 @@ The following setup instructions are for a system running Fedora 24, and Python 
 To set up an environment to contribute to the project checkout the latest project source from git:
 
     git clone https://github.com/arthurlockman/CGroup_Manager.git
-
+    git submodule init
+    git submodule update
 
 Next, install the system-level depdencies on your system:
 
     pip install virtualenv
-    dnf install python3-gobject pygobject3 python3-matplotlib-gtk3 python-matplotlib
+    dnf install python3-gobject pygobject3
 
 Then, switch to the project directory cloned from git, activate a new virtualenv with Python 3, and install the depdencies:
 

@@ -1,0 +1,3 @@
+[submodule "pygtkChart"]
+	path = pygtkChart
+	url = git://github.com/notmyname/pygtkChart
