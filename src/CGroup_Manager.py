@@ -20,7 +20,7 @@ builder.add_from_file(gladeFile)
 builder.connect_signals(AppEventHandler())
 
 # TOOD: Remove this
-sections = [45, 90, 20, 15]
+sections = [45, 90, 20, 15, 165]
 groups = []
 i = 0
 for s in sections:

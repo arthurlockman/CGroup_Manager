@@ -66,6 +66,7 @@ class PieChartRenderer:
         cr.translate(w / 2, h / 2)
         accum = 0
         self.polygons = []
+        print("Generating sections...")
         for section in self.sections:
             section_angle = (section.allocation / section.total) * 360.0
             x = r * math.cos(math.radians(section_angle + accum))
@@ -75,13 +76,13 @@ class PieChartRenderer:
             cr.set_source_rgb(0, 0, 0)
             cr.arc(0, 0, r, math.radians(accum), math.radians(section_angle + accum))
             cr.line_to(0, 0)
+            self.polygons.append(self.generate_click_polygon(accum, section_angle + accum, r))
             accum += section_angle
             cr.stroke_preserve()
             cr.close_path()
             cr.set_source_rgba(self.chart_color[0], self.chart_color[1],
                                self.chart_color[2], 0.6)
             cr.fill()
-            self.polygons.append([(0, 0), (x1, y1), (x, y)])
 
         cr.set_source_rgb(0, 0, 0)
         cr.arc(0, 0, r, math.radians(accum), 2 * math.pi)
@@ -91,6 +92,27 @@ class PieChartRenderer:
         cr.set_source_rgba(self.chart_color[0], self.chart_color[1],
                            self.chart_color[2], 0.1)
         cr.fill()
+
+    def generate_click_polygon(self, start_theta, end_theta, radius):
+        """
+        Generate the bounding polygon for the click area on the
+        pie chart.
+        :param self: self reference
+        :param start_theta:
+        :param end_theta:
+        :param radius:
+        """
+        polygon = [(0, 0)]
+        step_accum = 0
+        step_count = 10.0
+        step_amount = (end_theta - start_theta) / step_count
+        print(end_theta, start_theta, step_amount)
+        for step in range(int(step_count) + 1):
+            x = radius * math.cos(math.radians(start_theta + step_accum))
+            y = radius * math.sin(math.radians(start_theta + step_accum))
+            polygon.append((x, y))
+            step_accum += step_amount
+        return polygon
 
     def button_pressed(self, widget, event):
         self.click_active = int(round(time.time() * 1000))
