@@ -1,6 +1,7 @@
-import gi, math
+import gi, math, os
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from PieChartRenderer import PieChartRenderer
 
 class Handler:
     def onDeleteWindow(self, *args):
@@ -9,26 +10,21 @@ class Handler:
     def onButtonPressed(self, button):
         print("Hello World!")
 
-    def draw(self, widget, event):
-        cr = widget.get_property('window').cairo_create()
-
-        cr.set_line_width(9)
-        cr.set_source_rgb(0.7, 0.2, 0.0)
-
-        w = widget.get_allocation().width
-        h = widget.get_allocation().height
-
-        cr.translate(w/2, h/2)
-        cr.arc(0, 0, 50, 0, 2*math.pi)
-        cr.stroke_preserve()
-
-        cr.set_source_rgb(0.3, 0.4, 0.6)
-        cr.fill()
+path = os.path.dirname(os.path.abspath(__file__))
+gladeFile = os.path.join(path, "MainAppWindow.glade")
 
 builder = Gtk.Builder()
-builder.add_from_file("MainAppWindow.glade")
+builder.add_from_file(gladeFile)
 builder.connect_signals(Handler())
 
+ioChartRenderer = PieChartRenderer(builder.get_object('ioChartArea'),
+                                  (51/255.0, 102/255.0, 255/255.0))
+cpuhartRenderer = PieChartRenderer(builder.get_object('cpuChartArea'),
+                                  (102/255.0, 51/255.0, 255/255.0))
+memhartRenderer = PieChartRenderer(builder.get_object('memChartArea'),
+                                  (204/255.0, 51/255.0, 255/255.0))
+netChartRenderer = PieChartRenderer(builder.get_object('netChartArea'),
+                                   (255/255.0, 51/255.0, 204/255.0))
 window = builder.get_object("mainAppWindo")
 headerBar = builder.get_object("headerBar")
 window.set_titlebar(headerBar)
