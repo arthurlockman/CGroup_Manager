@@ -66,7 +66,6 @@ class PieChartRenderer:
         cr.translate(w / 2, h / 2)
         accum = 0
         self.polygons = []
-        print("Generating sections...")
         for section in self.sections:
             section_angle = (section.allocation / section.total) * 360.0
             x = r * math.cos(math.radians(section_angle + accum))
@@ -106,7 +105,6 @@ class PieChartRenderer:
         step_accum = 0
         step_count = 10.0
         step_amount = (end_theta - start_theta) / step_count
-        print(end_theta, start_theta, step_amount)
         for step in range(int(step_count) + 1):
             x = radius * math.cos(math.radians(start_theta + step_accum))
             y = radius * math.sin(math.radians(start_theta + step_accum))

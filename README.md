@@ -2,6 +2,7 @@
 
 This project was created to provide an easy method of interacting with and managing cgroups on linux systems. It targets Fedora 24, but can be expanded to support other linux releases.
 
+![CGroup Management GUI Screenshot](https://raw.githubusercontent.com/arthurlockman/CGroup_Manager/master/app_screenshot.png)
 
 ## Requirements
 
