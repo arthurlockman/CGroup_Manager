@@ -1,9 +1,38 @@
-import gi, math, time
+import gi
+import math
+import time
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import Gdk
 
-current_milli_time = lambda: int(round(time.time() * 1000))
+
+def point_inside_polygon(x, y, poly):
+    """
+    Determines if a mouse click or point falls inside a polygon
+    constructed of (x, y) points. Found from:
+    http://goo.gl/kppZzZ
+
+    :param x: x position of click
+    :param y: y position of click
+    :param poly: a list of polygon tuples defining the area of interest (x, y)
+    """
+    n = len(poly)
+    inside = False
+
+    p1x, p1y = poly[0]
+    for i in range(n + 1):
+        p2x, p2y = poly[i % n]
+        if y > min(p1y, p2y):
+            if y <= max(p1y, p2y):
+                if x <= max(p1x, p2x):
+                    if p1y != p2y:
+                        xinters = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
+                    if p1x == p2x or x <= xinters:
+                        inside = not inside
+        p1x, p1y = p2x, p2y
+    return inside
+
 
 class PieChartRenderer:
     def __init__(self, drawingArea, color, initial_groups):
@@ -19,6 +48,7 @@ class PieChartRenderer:
         self.chart_color = color
         self.click_active = 0
         self.sections = initial_groups
+        self.polygons = []
 
     def draw(self, widget, event):
         cr = widget.get_property('window').cairo_create()
@@ -33,12 +63,15 @@ class PieChartRenderer:
             r = w / 2 - (w / 10.0)
         else:
             r = h / 2 - (h / 10.0)
-        cr.translate(w/2, h/2)
-        accum = 0;
+        cr.translate(w / 2, h / 2)
+        accum = 0
+        self.polygons = []
         for section in self.sections:
             section_angle = (section.allocation / section.total) * 360.0
             x = r * math.cos(math.radians(section_angle + accum))
             y = r * math.sin(math.radians(section_angle + accum))
+            x1 = r * math.cos(math.radians(accum))
+            y1 = r * math.sin(math.radians(accum))
             cr.set_source_rgb(0, 0, 0)
             cr.arc(0, 0, r, math.radians(accum), math.radians(section_angle + accum))
             cr.line_to(0, 0)
@@ -48,9 +81,10 @@ class PieChartRenderer:
             cr.set_source_rgba(self.chart_color[0], self.chart_color[1],
                                self.chart_color[2], 0.6)
             cr.fill()
+            self.polygons.append([(0, 0), (x1, y1), (x, y)])
 
         cr.set_source_rgb(0, 0, 0)
-        cr.arc(0, 0, r, math.radians(accum), 2*math.pi)
+        cr.arc(0, 0, r, math.radians(accum), 2 * math.pi)
         cr.line_to(0, 0)
         cr.stroke_preserve()
         cr.close_path()
@@ -59,12 +93,21 @@ class PieChartRenderer:
         cr.fill()
 
     def button_pressed(self, widget, event):
-        self.click_active = current_milli_time()
+        self.click_active = int(round(time.time() * 1000))
 
     def button_released(self, widget, event):
-        if current_milli_time() - self.click_active < 1000:
-            print('Clicked!')
+        if int(round(time.time() * 1000)) - self.click_active < 1000:
+            window_w = widget.get_allocation().width
+            window_h = widget.get_allocation().height
+            pointer = widget.get_pointer()
+            mouse_x = pointer.x - window_w / 2
+            mouse_y = pointer.y - window_h / 2
+            for polygon in self.polygons:
+                if point_inside_polygon(mouse_x, mouse_y, polygon):
+                    idx = self.polygons.index(polygon)
+                    group = self.sections[idx]
+                    print(group.name)
+                    break
 
     def mouse_leave(self, widget, event):
         self.click_active = 0
-
