@@ -9,24 +9,30 @@ from gi.repository import Gdk
 
 # Color functions (get_random_color, color_distance,
 # generate_new_color) from https://gist.github.com/adewes/5884820
-def get_random_color(pastel_factor = 0.5):
-    return [(x+pastel_factor)/(1.0+pastel_factor) for x in [random.uniform(0,1.0) for i in [1,2,3]]]
 
-def color_distance(c1,c2):
-    return sum([abs(x[0]-x[1]) for x in zip(c1,c2)])
 
-def generate_new_color(existing_colors,pastel_factor = 0.5):
+def get_random_color(pastel_factor=0.5):
+    return [(x + pastel_factor) / (1.0 + pastel_factor) for x in [random.uniform(0, 1.0) for i in [1, 2, 3]]]
+
+
+def color_distance(c1, c2):
+    return sum([abs(x[0] - x[1]) for x in zip(c1, c2)])
+
+
+def generate_new_color(existing_colors, pastel_factor=0.5):
     max_distance = None
     best_color = None
-    for i in range(0,100):
-        color = get_random_color(pastel_factor = pastel_factor)
+    for i in range(0, 100):
+        color = get_random_color(pastel_factor=pastel_factor)
         if not existing_colors:
             return color
-        best_distance = min([color_distance(color,c) for c in existing_colors])
+        best_distance = min([color_distance(color, c)
+                             for c in existing_colors])
         if not max_distance or best_distance > max_distance:
             max_distance = best_distance
             best_color = color
     return best_color
+
 
 def point_inside_polygon(x, y, poly):
     """
@@ -56,6 +62,7 @@ def point_inside_polygon(x, y, poly):
 
 
 class PieChartRenderer:
+
     def __init__(self, drawingArea, color, initial_groups):
         print("Initializing pie chart renderer...")
         self.area = drawingArea
@@ -97,14 +104,17 @@ class PieChartRenderer:
             x1 = r * math.cos(math.radians(accum))
             y1 = r * math.sin(math.radians(accum))
             cr.set_source_rgb(0, 0, 0)
-            cr.arc(0, 0, r, math.radians(accum), math.radians(section_angle + accum))
+            cr.arc(0, 0, r, math.radians(accum),
+                   math.radians(section_angle + accum))
             cr.line_to(0, 0)
-            self.polygons.append(self.generate_click_polygon(accum, section_angle + accum, r))
+            self.polygons.append(self.generate_click_polygon(
+                accum, section_angle + accum, r))
             accum += section_angle
             cr.stroke_preserve()
             cr.close_path()
             if len(self.colors) < len(self.sections):
-                self.colors.append(generate_new_color(self.colors, pastel_factor = 0.9))
+                self.colors.append(generate_new_color(
+                    self.colors, pastel_factor=0.9))
             cr.set_source_rgba(self.colors[i][0], self.colors[i][1],
                                self.colors[i][2], 0.6)
             cr.fill()
@@ -115,9 +125,6 @@ class PieChartRenderer:
         cr.line_to(0, 0)
         cr.stroke_preserve()
         cr.close_path()
-        cr.set_source_rgba(self.chart_color[0], self.chart_color[1],
-                           self.chart_color[2], 0.1)
-        cr.fill()
 
     def generate_click_polygon(self, start_theta, end_theta, radius):
         """
@@ -164,7 +171,7 @@ class PieChartRenderer:
         for section in sections:
             accum += (section.allocation / section.total) * 360.0
         if accum > 360:
-            raise OverflowError('Sections set in pie chart overflow chart bounds.')
+            raise OverflowError(
+                'Sections set in pie chart overflow chart bounds.')
         else:
             self.sections = sections
-
