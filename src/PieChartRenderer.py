@@ -63,9 +63,10 @@ def point_inside_polygon(x, y, poly):
 
 class PieChartRenderer:
 
-    def __init__(self, drawingArea, color, initial_groups):
+    def __init__(self, drawingArea, color, initial_groups, resource):
         print("Initializing pie chart renderer...")
         self.area = drawingArea
+        self.resource = resource
         self.area.connect('draw', self.draw)
         self.area.connect('button-press-event', self.button_pressed)
         self.area.connect('button-release-event', self.button_released)
@@ -75,6 +76,7 @@ class PieChartRenderer:
                              Gdk.EventMask.LEAVE_NOTIFY_MASK)
         self.chart_color = color
         self.click_active = 0
+        self.sections = []
         self.set_sections(initial_groups)
         self.polygons = []
         self.colors = [self.chart_color]
@@ -98,7 +100,8 @@ class PieChartRenderer:
         self.colors = [self.chart_color]
         i = 0
         for section in self.sections:
-            section_angle = (section.allocation / section.total) * 360.0
+            section_angle = (section.resources[
+                             self.resource].allocation / section.resources[self.resource].max_allocation) * 360.0
             x = r * math.cos(math.radians(section_angle + accum))
             y = r * math.sin(math.radians(section_angle + accum))
             x1 = r * math.cos(math.radians(accum))
@@ -169,9 +172,13 @@ class PieChartRenderer:
     def set_sections(self, sections):
         accum = 0
         for section in sections:
-            accum += (section.allocation / section.total) * 360.0
+            accum += (section.resources[self.resource].allocation /
+                      section.resources[self.resource].max_allocation) * 360.0
         if accum > 360:
             raise OverflowError(
                 'Sections set in pie chart overflow chart bounds.')
         else:
-            self.sections = sections
+            self.sections = []
+            for section in sections:
+                if section.resources[self.resource].allocation != 0:
+                    self.sections.append(section)

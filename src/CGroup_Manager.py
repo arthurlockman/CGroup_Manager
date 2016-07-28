@@ -4,8 +4,8 @@ import os
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from PieChartRenderer import PieChartRenderer
-from CGroup import CGroup
-
+from Unit import Unit
+from CGroupAPI import CGroupAPI
 
 class AppEventHandler:
 
@@ -23,30 +23,24 @@ class CGroupManager:
         builder.add_from_file(gladeFile)
         builder.connect_signals(AppEventHandler())
 
-        # TOOD: Remove this
-        sections = [45, 90, 20, 15, 165]
-        groups = []
-        i = 0
-        for s in sections:
-            groups.append(CGroup('test' + str(i), 'cpu', s))
-            i += 1
+        api = CGroupAPI()
 
-        self.ioChartRenderer = PieChartRenderer(builder.get_object('ioChartArea'),
-                                                (51 / 255.0, 102 /
-                                                 255.0, 255 / 255.0),
-                                                groups)
+        # self.ioChartRenderer = PieChartRenderer(builder.get_object('ioChartArea'),
+        #                                         (51 / 255.0, 102 /
+        #                                          255.0, 255 / 255.0),
+        #                                         groups)
         self.cpuChartRenderer = PieChartRenderer(builder.get_object('cpuChartArea'),
                                                  (102 / 255.0, 51 /
                                                   255.0, 255 / 255.0),
-                                                 groups)
-        self.memChartRenderer = PieChartRenderer(builder.get_object('memChartArea'),
-                                                 (204 / 255.0, 51 /
-                                                  255.0, 255 / 255.0),
-                                                 groups)
-        self.netChartRenderer = PieChartRenderer(builder.get_object('netChartArea'),
-                                                 (255 / 255.0, 51 /
-                                                  255.0, 204 / 255.0),
-                                                 groups)
+                                                 api.units, 'CPUQuotaPerSecUSec')
+        # self.memChartRenderer = PieChartRenderer(builder.get_object('memChartArea'),
+        #                                          (204 / 255.0, 51 /
+        #                                           255.0, 255 / 255.0),
+        #                                          groups)
+        # self.netChartRenderer = PieChartRenderer(builder.get_object('netChartArea'),
+        #                                          (255 / 255.0, 51 /
+        #                                           255.0, 204 / 255.0),
+        #                                          groups)
 
         self.window = builder.get_object("mainAppWindow")
         headerBar = builder.get_object("headerBar")
