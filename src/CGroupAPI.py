@@ -17,14 +17,6 @@ class CGroupAPI:
         self.systemd = dbus_proxy.get_object('org.freedesktop.systemd1',
                                              '/org/freedesktop/systemd1')
         self.units = []
-        units = self.systemd.ListUnits(
-            dbus_interface='org.freedesktop.systemd1.Manager')
-        for unit in units:
-            new_unit = Unit(unit[0])
-            res = Resource('CPUQuotaPerSecUSec', self.get_group_property(
-                'CPUQuotaPerSecUSec', new_unit.name), self.processors * 1000)
-            new_unit.resources['CPUQuotaPerSecUSec'] = res
-            self.units.append(new_unit)
 
     def get_group_property(self, prop, group):
         """
@@ -44,6 +36,18 @@ class CGroupAPI:
         else:
             return_prop = 0
         return return_prop
+
+    def refresh(self, resource_name, pie_chart):
+        self.units = []
+        units = self.systemd.ListUnits(
+            dbus_interface='org.freedesktop.systemd1.Manager')
+        for unit in units:
+            new_unit = Unit(unit[0])
+            res = Resource(resource_name, self.get_group_property(
+                resource_name, new_unit.name), self.processors * 1000)
+            new_unit.resources[resource_name] = res
+            self.units.append(new_unit)
+        pie_chart.set_sections(self.units)
 
 
 if __name__ == '__main__':

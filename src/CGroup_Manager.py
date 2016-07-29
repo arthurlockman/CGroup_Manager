@@ -3,9 +3,11 @@ import os
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from multiprocessing import Process
 from PieChartRenderer import PieChartRenderer
 from Unit import Unit
 from CGroupAPI import CGroupAPI
+
 
 class AppEventHandler:
 
@@ -33,6 +35,7 @@ class CGroupManager:
                                                  (102 / 255.0, 51 /
                                                   255.0, 255 / 255.0),
                                                  api.units, 'CPUQuotaPerSecUSec')
+        api.refresh('CPUQuotaPerSecUSec', self.cpuChartRenderer)
         # self.memChartRenderer = PieChartRenderer(builder.get_object('memChartArea'),
         #                                          (204 / 255.0, 51 /
         #                                           255.0, 255 / 255.0),
