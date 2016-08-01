@@ -34,8 +34,8 @@ class CGroupManager:
         self.cpuChartRenderer = PieChartRenderer(builder.get_object('cpuChartArea'),
                                                  (102 / 255.0, 51 /
                                                   255.0, 255 / 255.0),
-                                                 api.units, 'CPUQuotaPerSecUSec')
-        api.refresh('CPUQuotaPerSecUSec', self.cpuChartRenderer)
+                                                 api.units, 'cpu')
+        api.refresh('cpu', self.cpuChartRenderer)
         # self.memChartRenderer = PieChartRenderer(builder.get_object('memChartArea'),
         #                                          (204 / 255.0, 51 /
         #                                           255.0, 255 / 255.0),
