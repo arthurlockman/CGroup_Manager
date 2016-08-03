@@ -63,7 +63,7 @@ def point_inside_polygon(x, y, poly):
 
 class PieChartRenderer:
 
-    def __init__(self, drawingArea, color, initial_groups, resource):
+    def __init__(self, drawingArea, color, resource):
         print("Initializing pie chart renderer...")
         self.area = drawingArea
         self.resource = resource
@@ -77,7 +77,6 @@ class PieChartRenderer:
         self.chart_color = color
         self.click_active = 0
         self.sections = []
-        self.set_sections(initial_groups)
         self.polygons = []
         self.colors = [self.chart_color]
 
@@ -172,13 +171,12 @@ class PieChartRenderer:
     def set_sections(self, sections):
         accum = 0
         for section in sections:
-            accum += (section.resources[self.resource].allocation /
-                      section.resources[self.resource].max_allocation) * 360.0
+            accum += section.resources[self.resource].get_percentage() * 360.0
         if accum > 360:
             raise OverflowError(
                 'Sections set in pie chart overflow chart bounds.')
         else:
             self.sections = []
             for section in sections:
-                if section.resources[self.resource].allocation != 0:
+                if section.resources[self.resource].enabled:
                     self.sections.append(section)

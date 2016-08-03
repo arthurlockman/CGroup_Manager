@@ -2,6 +2,7 @@ import dbus
 import subprocess
 import re
 import multiprocessing
+import os
 
 from Unit import Unit
 from Resource import Resource
@@ -55,11 +56,11 @@ class CGroupAPI:
         elif resource == 'mem':
             enable_prop = 'MemoryAccounting'
             value_prop = 'MemoryLimit'
-            max_allocation = 10000000  # TODO: Fix this
+            max_allocation = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
         elif resource == 'blkio':
             enable_prop = 'BlockIOAccounting'
             value_prop = 'BlockIOWeight'
-            max_allocation = 100000000  # TODO: Fix this
+            max_allocation = 1000  # TODO: Fix this
 
         tmp = self.shell_command(group, enable_prop)
         enable_val = tmp.replace('\n', '').split('=')

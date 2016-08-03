@@ -27,23 +27,21 @@ class CGroupManager:
 
         api = CGroupAPI()
 
-        # self.ioChartRenderer = PieChartRenderer(builder.get_object('ioChartArea'),
-        #                                         (51 / 255.0, 102 /
-        #                                          255.0, 255 / 255.0),
-        #                                         groups)
+        self.ioChartRenderer = PieChartRenderer(builder.get_object('ioChartArea'),
+                                                (51 / 255.0, 102 /
+                                                 255.0, 255 / 255.0),
+                                                'io')
+        api.refresh('io', self.ioChartRenderer)
         self.cpuChartRenderer = PieChartRenderer(builder.get_object('cpuChartArea'),
                                                  (102 / 255.0, 51 /
                                                   255.0, 255 / 255.0),
-                                                 api.units, 'cpu')
+                                                 'cpu')
         api.refresh('cpu', self.cpuChartRenderer)
-        # self.memChartRenderer = PieChartRenderer(builder.get_object('memChartArea'),
-        #                                          (204 / 255.0, 51 /
-        #                                           255.0, 255 / 255.0),
-        #                                          groups)
-        # self.netChartRenderer = PieChartRenderer(builder.get_object('netChartArea'),
-        #                                          (255 / 255.0, 51 /
-        #                                           255.0, 204 / 255.0),
-        #                                          groups)
+        self.memChartRenderer = PieChartRenderer(builder.get_object('memChartArea'),
+                                                 (204 / 255.0, 51 /
+                                                  255.0, 255 / 255.0),
+                                                 'mem')
+        api.refresh('mem', self.memChartRenderer)
 
         self.window = builder.get_object("mainAppWindow")
         headerBar = builder.get_object("headerBar")
