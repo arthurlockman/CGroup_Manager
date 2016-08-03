@@ -26,7 +26,7 @@ To set up an environment to contribute to the project checkout the latest projec
 Next, install the system-level depdencies on your system:
 
     pip install virtualenv
-    dnf install python3-gobject pygobject3 dbus-glib-devel
+    dnf install python3-gobject pygobject3 dbus-glib-devel cairo-gobject-devel python3-cairo-devel cairo-devel redhat-rpm-config
 
 Then, switch to the project directory cloned from git, activate a new virtualenv with Python 3, and install the depdencies:
 

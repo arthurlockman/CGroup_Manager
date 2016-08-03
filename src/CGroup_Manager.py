@@ -10,9 +10,15 @@ from CGroupAPI import CGroupAPI
 
 
 class AppEventHandler:
-
+    def __init__(self, manager):
+        self.manager = manager
+    
     def on_delete_window(self, *args):
         Gtk.main_quit(*args)
+
+    def on_refresh(self, *args):
+        print('refreshing view...')
+        self.manager.refresh()
 
 
 class CGroupManager:
@@ -23,26 +29,23 @@ class CGroupManager:
 
         builder = Gtk.Builder()
         builder.add_from_file(gladeFile)
-        builder.connect_signals(AppEventHandler())
+        builder.connect_signals(AppEventHandler(self))
 
-        api = CGroupAPI()
+        self.api = CGroupAPI()
 
         self.ioChartRenderer = PieChartRenderer(builder.get_object('ioChartArea'),
                                                 (51 / 255.0, 102 /
                                                  255.0, 255 / 255.0),
                                                 'io')
-        api.refresh('io', self.ioChartRenderer)
         self.cpuChartRenderer = PieChartRenderer(builder.get_object('cpuChartArea'),
                                                  (102 / 255.0, 51 /
                                                   255.0, 255 / 255.0),
                                                  'cpu')
-        api.refresh('cpu', self.cpuChartRenderer)
         self.memChartRenderer = PieChartRenderer(builder.get_object('memChartArea'),
                                                  (204 / 255.0, 51 /
                                                   255.0, 255 / 255.0),
                                                  'mem')
-        api.refresh('mem', self.memChartRenderer)
-
+        self.refresh()
         self.window = builder.get_object("mainAppWindow")
         headerBar = builder.get_object("headerBar")
         self.window.set_titlebar(headerBar)
@@ -50,6 +53,11 @@ class CGroupManager:
     def main(self):
         self.window.show_all()
         Gtk.main()
+
+    def refresh(self):
+        self.api.refresh('io', self.ioChartRenderer)
+        self.api.refresh('cpu', self.cpuChartRenderer)
+        self.api.refresh('mem', self.memChartRenderer)
 
 if __name__ == '__main__':
     cgroup_manager = CGroupManager()
