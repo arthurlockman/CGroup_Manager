@@ -19,25 +19,6 @@ class CGroupAPI:
                                              '/org/freedesktop/systemd1')
         self.units = []
 
-    def get_group_property(self, prop, group):
-        """
-        Get a property from a group.
-        """
-        systemctl_cmd = subprocess.Popen(
-            ['systemctl', 'show', group, '-p', prop], stdout=subprocess.PIPE)
-        systemctl_prop = systemctl_cmd.communicate()[0].decode(
-            'utf-8').replace('\n', '').split('=')
-        if (len(systemctl_prop) > 1):
-            non_decimal = re.compile(r'[^\d.]+')
-            return_prop = non_decimal.sub('', systemctl_prop[1])
-            if (return_prop != ''):
-                return_prop = int(return_prop)
-            else:
-                return_prop = 0
-        else:
-            return_prop = 0
-        return return_prop
-
     def shell_command(self, group, prop):
         process = subprocess.Popen(['systemctl', 'show', group, '-p', prop], stdout=subprocess.PIPE)
         val = process.communicate()[0]
