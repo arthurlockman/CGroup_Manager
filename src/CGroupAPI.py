@@ -3,6 +3,9 @@ import subprocess
 import re
 import multiprocessing
 import os
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 from Unit import Unit
 from Resource import Resource
@@ -20,7 +23,8 @@ class CGroupAPI:
         self.units = []
 
     def shell_command(self, group, prop):
-        process = subprocess.Popen(['systemctl', 'show', group, '-p', prop], stdout=subprocess.PIPE)
+        process = subprocess.Popen(
+            ['systemctl', 'show', group, '-p', prop], stdout=subprocess.PIPE)
         val = process.communicate()[0]
         return val.decode('utf-8')
 
@@ -37,7 +41,8 @@ class CGroupAPI:
         elif resource == 'mem':
             enable_prop = 'MemoryAccounting'
             value_prop = 'MemoryLimit'
-            max_allocation = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
+            max_allocation = os.sysconf(
+                'SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
         elif resource == 'blkio':
             enable_prop = 'BlockIOAccounting'
             value_prop = 'BlockIOWeight'
@@ -71,17 +76,21 @@ class CGroupAPI:
             allocation = 0
         return Resource(resource, allocation, max_allocation, enabled)
 
-    def refresh(self, resource, pie_chart):
+    def refresh(self, pie_charts, unit_list):
         self.units = []
+        self.unit_liststore = Gtk.ListStore(str, str, str, str)
         units = self.systemd.ListUnits(
             dbus_interface='org.freedesktop.systemd1.Manager')
         for unit in units:
             new_unit = Unit(unit[0])
-            res = self.get_resource(new_unit.name, resource)
-            new_unit.resources[resource] = res
+            for resource in ['mem', 'io', 'cpu']:
+                res = self.get_resource(new_unit.name, resource)
+                new_unit.resources[resource] = res
             self.units.append(new_unit)
-        pie_chart.set_sections(self.units)
+        for chart in pie_charts:
+            chart.set_sections(self.units)
 
 
 if __name__ == '__main__':
     cg = CGroupAPI()
+    cg.refresh([], None)

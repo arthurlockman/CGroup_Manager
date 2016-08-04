@@ -10,9 +10,10 @@ from CGroupAPI import CGroupAPI
 
 
 class AppEventHandler:
+
     def __init__(self, manager):
         self.manager = manager
-    
+
     def on_delete_window(self, *args):
         Gtk.main_quit(*args)
 
@@ -33,6 +34,21 @@ class CGroupManager:
 
         self.api = CGroupAPI()
 
+        self.unitListArea = builder.get_object('unitListArea')
+        self.unit_liststore = Gtk.ListStore(str, str, str, str)
+        self.unitListArea.set_model(self.unit_liststore)
+        renderer1 = Gtk.CellRendererText()
+        col1 = Gtk.TreeViewColumn("Unit", renderer1, text=0)
+        renderer2 = Gtk.CellRendererText()
+        col2 = Gtk.TreeViewColumn("I/O", renderer2, text=0)
+        renderer3 = Gtk.CellRendererText()
+        col3 = Gtk.TreeViewColumn("Memory", renderer3, text=0)
+        renderer4 = Gtk.CellRendererText()
+        col4 = Gtk.TreeViewColumn("CPU", renderer4, text=0)
+        self.unitListArea.append_column(col1)
+        self.unitListArea.append_column(col2)
+        self.unitListArea.append_column(col3)
+        self.unitListArea.append_column(col4)
         self.ioChartRenderer = PieChartRenderer(builder.get_object('ioChartArea'),
                                                 (51 / 255.0, 102 /
                                                  255.0, 255 / 255.0),
@@ -55,9 +71,8 @@ class CGroupManager:
         Gtk.main()
 
     def refresh(self):
-        self.api.refresh('io', self.ioChartRenderer)
-        self.api.refresh('cpu', self.cpuChartRenderer)
-        self.api.refresh('mem', self.memChartRenderer)
+        self.api.refresh([self.ioChartRenderer, self.cpuChartRenderer,
+                          self.memChartRenderer], self.unitListArea)
 
 if __name__ == '__main__':
     cgroup_manager = CGroupManager()

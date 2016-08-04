@@ -72,7 +72,7 @@
             <property name="row_homogeneous">True</property>
             <property name="column_homogeneous">True</property>
             <child>
-              <object class="GtkTreeView">
+              <object class="GtkTreeView" id="unitListArea">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <child internal-child="selection">
