@@ -13,7 +13,9 @@ class Unit:
         """
         ret = []
         ret.append(self.name)
-        ret.append(str(self.resources['io'].allocation))
-        ret.append(str(self.resources['mem'].allocation))
-        ret.append(str(self.resources['cpu'].allocation))
+        for rsrc in ['io', 'mem', 'cpu']:
+            if self.resources[rsrc].enabled:
+                ret.append(str(self.resources[rsrc].get_percentage() * 100.0) + "%")
+            else:
+                ret.append('disabled')
         return ret

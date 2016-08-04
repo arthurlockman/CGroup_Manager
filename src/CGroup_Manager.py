@@ -39,12 +39,16 @@ class CGroupManager:
         self.unitListArea.set_model(self.unit_liststore)
         renderer1 = Gtk.CellRendererText()
         col1 = Gtk.TreeViewColumn("Unit", renderer1, text=0)
+        col1.set_sort_column_id(0)
         renderer2 = Gtk.CellRendererText()
-        col2 = Gtk.TreeViewColumn("I/O", renderer2, text=0)
+        col2 = Gtk.TreeViewColumn("I/O", renderer2, text=1)
+        col2.set_sort_column_id(1)
         renderer3 = Gtk.CellRendererText()
-        col3 = Gtk.TreeViewColumn("Memory", renderer3, text=0)
+        col3 = Gtk.TreeViewColumn("Memory", renderer3, text=2)
+        col3.set_sort_column_id(2)
         renderer4 = Gtk.CellRendererText()
-        col4 = Gtk.TreeViewColumn("CPU", renderer4, text=0)
+        col4 = Gtk.TreeViewColumn("CPU", renderer4, text=3)
+        col4.set_sort_column_id(3)
         self.unitListArea.append_column(col1)
         self.unitListArea.append_column(col2)
         self.unitListArea.append_column(col3)
@@ -73,6 +77,9 @@ class CGroupManager:
     def refresh(self):
         self.api.refresh([self.ioChartRenderer, self.cpuChartRenderer,
                           self.memChartRenderer], self.unitListArea)
+        self.unit_liststore.clear()
+        for unit in self.api.units:
+            self.unit_liststore.append(unit.get_list_row())
 
 if __name__ == '__main__':
     cgroup_manager = CGroupManager()

@@ -79,8 +79,10 @@ class PieChartRenderer:
         self.sections = []
         self.polygons = []
         self.colors = [self.chart_color]
+        self.widget = None
 
     def draw(self, widget, event):
+        self.widget = widget
         cr = widget.get_property('window').cairo_create()
 
         cr.set_line_width(2)
@@ -127,6 +129,12 @@ class PieChartRenderer:
         cr.line_to(0, 0)
         cr.stroke_preserve()
         cr.close_path()
+
+    def invalidate(self):
+        if self.widget is not None:
+            rect = self.widget.get_allocation()
+            print(rect.x, rect.y, rect.width, rect.height)
+            self.widget.get_root_window().invalidate_rect(rect, False) #TODO: Fix this method
 
     def generate_click_polygon(self, start_theta, end_theta, radius):
         """
@@ -180,3 +188,4 @@ class PieChartRenderer:
             for section in sections:
                 if section.resources[self.resource].enabled:
                     self.sections.append(section)
+        self.invalidate()
